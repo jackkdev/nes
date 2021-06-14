@@ -1,1 +1,0 @@
-CMakeLists.txt not found in D:\Projects\C++\nes Select CMakeLists.txt
