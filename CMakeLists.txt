@@ -10,4 +10,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/dist)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/dist)
 set(CMAKE_CXX_STANDARD 20)
 
+add_subdirectory(extern/glad)
+add_subdirectory(extern/glfw)
+add_subdirectory(extern/glm)
+
 add_subdirectory(nes)
