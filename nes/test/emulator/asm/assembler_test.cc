@@ -8,69 +8,122 @@
 using namespace nes;
 
 TEST(Assembler, Tokenizer) {
-  Assembler assembler;
+  using Type = Assembler::TokenType;
+  struct TestCase {
+    std::string input;
+    std::vector<Assembler::Token> tokens;
+  };
 
-  using TT = Assembler::TokenType;
-  Assembler::Token expected_tokens[] = {
+  std::vector<TestCase> test_cases = {
       {
-        .type = TT::LITERAL,
-        .data = "lda",
+          .input = "lda #$AA\nsta $0000\nldx #$FA\nstx ($00,X)",
+          .tokens = {
+              {
+                  .type = Type::LITERAL,
+                  .data = "lda",
+              },
+              {
+                  .type = Type::HEXADECIMAL_NUMBER,
+                  .data = "AA",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "sta",
+              },
+              {
+                  .type = Type::HEXADECIMAL_ADDRESS,
+                  .data = "0000",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "ldx",
+              },
+              {
+                  .type = Type::HEXADECIMAL_NUMBER,
+                  .data = "FA",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "stx",
+              },
+              {
+                  .type = Type::PARENTHESES,
+                  .data = "(",
+              },
+              {
+                  .type = Type::HEXADECIMAL_ADDRESS,
+                  .data = "00",
+              },
+              {
+                  .type = Type::COMMA,
+                  .data = ",",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "X",
+              },
+              {
+                  .type = Type::PARENTHESES,
+                  .data = ")",
+              },
+          },
       },
       {
-        .type = TT::HEXADECIMAL_NUMBER,
-        .data = "AA",
-      },
-      {
-        .type = TT::LITERAL,
-        .data = "sta",
-      },
-      {
-        .type = TT::HEXADECIMAL_ADDRESS,
-        .data = "0000",
-      },
-      {
-        .type = TT::LITERAL,
-        .data = "ldx",
-      },
-      {
-        .type = TT::HEXADECIMAL_NUMBER,
-        .data = "FA",
-      },
-      {
-        .type = TT::LITERAL,
-        .data = "stx",
-      },
-      {
-        .type = TT::PARENTHESES,
-        .data = "(",
-      },
-      {
-        .type = TT::HEXADECIMAL_ADDRESS,
-        .data = "00",
-      },
-      {
-        .type = TT::COMMA,
-        .data = ",",
-      },
-      {
-        .type = TT::LITERAL,
-        .data = "X",
-      },
-      {
-        .type = TT::PARENTHESES,
-        .data = ")",
+          .input = "asl\nsta temp\nasl\nasl\nclc\nadc temp\nrts",
+          .tokens = {
+              {
+                  .type = Type::LITERAL,
+                  .data = "asl",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "sta",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "temp",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "asl",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "asl",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "clc",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "adc",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "temp",
+              },
+              {
+                  .type = Type::LITERAL,
+                  .data = "rts",
+              },
+          }
       },
   };
 
-  auto tokens = assembler.Tokenize("lda #$AA\nsta $0000\nldx #$FA\nstx ($00,X)");
-  for (int i = 0; i < tokens.size(); i++) {
-    auto expected = expected_tokens[i];
-    auto found = tokens[i];
+  Assembler assembler;
+  for (auto &test_case : test_cases) {
+    auto returned_tokens = assembler.Tokenize(test_case.input);
 
-    std::cout << "[          ] Expected Token: " << Assembler::TypeToString(expected.type) << std::endl;
-    std::cout << "[          ] Token: " << Assembler::TypeToString(found.type) << std::endl;
+    if (returned_tokens.size() != test_case.tokens.size())
+      FAIL() << "returned_tokens.size() != test_case.tokens.size()";
 
-    EXPECT_STREQ(found.data.c_str(), expected.data.c_str());
-    EXPECT_EQ(found.type, expected.type);
+    for (int i = 0; i < returned_tokens.size(); i++) {
+      auto expected = returned_tokens[i];
+      auto found = test_case.tokens[i];
+
+      EXPECT_STREQ(found.data.c_str(), expected.data.c_str()) << "found.data != expected.data";
+      EXPECT_EQ(found.type, expected.type) << "found.type != << expected.type";
+    }
   }
 }
