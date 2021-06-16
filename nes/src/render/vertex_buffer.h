@@ -15,14 +15,14 @@ namespace nes {
 
 class VertexBuffer {
  public:
-	VertexBuffer();
-	~VertexBuffer();
+  VertexBuffer();
+  ~VertexBuffer();
 
-	void SetData(void *vertices, i32 vertices_size, i32 draw_mode) const;
-	void Bind() const;
+  void SetData(void *vertices, i32 vertices_size, i32 draw_mode) const;
+  void Bind() const;
 
  private:
-	u32 buffer_id_ = 0;
+  u32 buffer_id_ = 0;
 };
 
 }

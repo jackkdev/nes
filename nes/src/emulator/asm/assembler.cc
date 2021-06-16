@@ -11,187 +11,187 @@
 namespace nes {
 
 enum class TokenizerState {
-	START,
-	LITERAL,
-	HEXADECIMAL_NUMBER,
-	DECIMAL_NUMBER,
-	COMMENT,
-	END,
+  START,
+  LITERAL,
+  HEXADECIMAL_NUMBER,
+  DECIMAL_NUMBER,
+  COMMENT,
+  END,
 };
 
 std::vector<Assembler::Token> Assembler::Tokenize(const std::string &source) {
-	// Validation strings for literals.
-	static std::string s_literal_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-	static std::string s_literal_first_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  // Validation strings for literals.
+  static std::string s_literal_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+  static std::string s_literal_first_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-	// Validation string for hexadecimal numbers.
-	static std::string s_hexadecimal_characters = "abcdefABCDEF0123456789";
+  // Validation string for hexadecimal numbers.
+  static std::string s_hexadecimal_characters = "abcdefABCDEF0123456789";
 
-	// Validation string for decimal numbers.
-	static std::string s_decimal_characters = "0123456789";
+  // Validation string for decimal numbers.
+  static std::string s_decimal_characters = "0123456789";
 
-	// Single character validation map.
-	static std::map<char, TokenType> s_single_character_map = {
-			std::make_pair(':', TokenType::COLLEN),
-			std::make_pair('(', TokenType::PARENTHESES),
-			std::make_pair(')', TokenType::PARENTHESES),
-			std::make_pair(',', TokenType::COMMA),
-			std::make_pair('#', TokenType::HASHTAG),
-			std::make_pair('$', TokenType::DOLLAR_SIGN),
-	};
+  // Single character validation map.
+  static std::map<char, TokenType> s_single_character_map = {
+      std::make_pair(':', TokenType::COLLEN),
+      std::make_pair('(', TokenType::PARENTHESES),
+      std::make_pair(')', TokenType::PARENTHESES),
+      std::make_pair(',', TokenType::COMMA),
+      std::make_pair('#', TokenType::HASHTAG),
+      std::make_pair('$', TokenType::DOLLAR_SIGN),
+  };
 
-	// Container to store tokens generated from the source.
-	std::vector<Assembler::Token> tokens;
+  // Container to store tokens generated from the source.
+  std::vector<Assembler::Token> tokens;
 
-	// The current "state" of the tokenizer.
-	auto state = TokenizerState::START;
+  // The current "state" of the tokenizer.
+  auto state = TokenizerState::START;
 
-	bool eof = false;
-	i32 index = 0;
-	Token token = {};
+  bool eof = false;
+  i32 index = 0;
+  Token token = {};
 
-	while (!eof) {
-		// Every iteration we'll read the state value, and modify the current token based on that.
-		switch (state) {
-			case TokenizerState::START: {
-				// Read in the current source character.
-				char input = source[index];
+  while (!eof) {
+    // Every iteration we'll read the state value, and modify the current token based on that.
+    switch (state) {
+      case TokenizerState::START: {
+        // Read in the current source character.
+        char input = source[index];
 
-				// We'll start with a hexadecimal number since it can switch mid-tokenization to a literal if the continuing
-				// characters aren't within the hexadecimal validation string.
-				if (s_hexadecimal_characters.find(input) != std::string::npos) {
-					token.type = TokenType::HEXADECIMAL_NUMBER;
-					token.data += input;
+        // We'll start with a hexadecimal number since it can switch mid-tokenization to a literal if the continuing
+        // characters aren't within the hexadecimal validation string.
+        if (s_hexadecimal_characters.find(input) != std::string::npos) {
+          token.type = TokenType::HEXADECIMAL_NUMBER;
+          token.data += input;
 
-					state = TokenizerState::HEXADECIMAL_NUMBER;
-					index++;
+          state = TokenizerState::HEXADECIMAL_NUMBER;
+          index++;
 
-					break;
-				}
+          break;
+        }
 
-				// Literal check.
-				if (s_literal_first_characters.find(input) != std::string::npos) {
-					token.type = TokenType::LITERAL;
-					token.data += input;
+        // Literal check.
+        if (s_literal_first_characters.find(input) != std::string::npos) {
+          token.type = TokenType::LITERAL;
+          token.data += input;
 
-					state = TokenizerState::LITERAL;
-					index++;
+          state = TokenizerState::LITERAL;
+          index++;
 
-					break;
-				}
+          break;
+        }
 
-				// Decimal number check.
-				if (s_decimal_characters.find(input) != std::string::npos) {
-					token.type = TokenType::DECIMAL_NUMBER;
-					token.data += input;
+        // Decimal number check.
+        if (s_decimal_characters.find(input) != std::string::npos) {
+          token.type = TokenType::DECIMAL_NUMBER;
+          token.data += input;
 
-					state = TokenizerState::DECIMAL_NUMBER;
-					index++;
+          state = TokenizerState::DECIMAL_NUMBER;
+          index++;
 
-					break;
-				}
+          break;
+        }
 
-				// Character map validation check.
-				if (s_single_character_map.contains(input)) {
-					token.type = s_single_character_map[input];
-					token.data = input;
+        // Character map validation check.
+        if (s_single_character_map.contains(input)) {
+          token.type = s_single_character_map[input];
+          token.data = input;
 
-					state = TokenizerState::END;
-					index++;
+          state = TokenizerState::END;
+          index++;
 
-					break;
-				}
+          break;
+        }
 
-				// Finally, if nothing happens we'll just skip the character.
-				index++;
+        // Finally, if nothing happens we'll just skip the character.
+        index++;
 
-				break;
-			}
+        break;
+      }
 
-			case TokenizerState::LITERAL: {
-				if (index >= source.length()) {
-					state = TokenizerState::END;
-					break;
-				}
+      case TokenizerState::LITERAL: {
+        if (index >= source.length()) {
+          state = TokenizerState::END;
+          break;
+        }
 
-				char input = source[index];
+        char input = source[index];
 
-				// Save the token if the character isn't valid.
-				if (s_literal_characters.find(input) == std::string::npos) {
-					state = TokenizerState::END;
-					break;
-				}
+        // Save the token if the character isn't valid.
+        if (s_literal_characters.find(input) == std::string::npos) {
+          state = TokenizerState::END;
+          break;
+        }
 
-				token.data += input;
-				index++;
+        token.data += input;
+        index++;
 
-				break;
-			};
+        break;
+      };
 
-			case TokenizerState::HEXADECIMAL_NUMBER: {
-				if (index >= source.length()) {
-					state = TokenizerState::END;
-					break;
-				}
+      case TokenizerState::HEXADECIMAL_NUMBER: {
+        if (index >= source.length()) {
+          state = TokenizerState::END;
+          break;
+        }
 
-				char input = source[index];
+        char input = source[index];
 
-				// Check if the input character exists within the hexadecimal validation characters.
-				if (s_hexadecimal_characters.find(input) == std::string::npos) {
-					// If not, we'll check if it's a valid literal character, and switch state.
-					if (s_literal_characters.find(input) != std::string::npos) {
-						token.type = TokenType::LITERAL;
-						token.data += input;
+        // Check if the input character exists within the hexadecimal validation characters.
+        if (s_hexadecimal_characters.find(input) == std::string::npos) {
+          // If not, we'll check if it's a valid literal character, and switch state.
+          if (s_literal_characters.find(input) != std::string::npos) {
+            token.type = TokenType::LITERAL;
+            token.data += input;
 
-						// Switching to the literal token type since this is no longer a valid hex string.
-						state = TokenizerState::LITERAL;
-						index++;
+            // Switching to the literal token type since this is no longer a valid hex string.
+            state = TokenizerState::LITERAL;
+            index++;
 
-						break;
-					}
+            break;
+          }
 
-					// If we're here then it's the end of the number.
-					state = TokenizerState::END;
-					break;
-				}
+          // If we're here then it's the end of the number.
+          state = TokenizerState::END;
+          break;
+        }
 
-				// Add the input to the current token, and continue.
-				token.data += input;
-				index++;
+        // Add the input to the current token, and continue.
+        token.data += input;
+        index++;
 
-				break;
-			}
+        break;
+      }
 
-			case TokenizerState::DECIMAL_NUMBER: break;
+      case TokenizerState::DECIMAL_NUMBER: break;
 
-			case TokenizerState::COMMENT: break;
+      case TokenizerState::COMMENT: break;
 
-			case TokenizerState::END: {
-				// First we need to check if there even is a token to save.
-				if (!token.data.empty()) {
-					tokens.push_back(token);
-					token.data = "";
-				}
+      case TokenizerState::END: {
+        // First we need to check if there even is a token to save.
+        if (!token.data.empty()) {
+          tokens.push_back(token);
+          token.data = "";
+        }
 
-				// Again, perform the sanity check to exit the loop if we've read every character.
-				if (index >= source.length())
-					eof = true;
+        // Again, perform the sanity check to exit the loop if we've read every character.
+        if (index >= source.length())
+          eof = true;
 
-				// This won't matter if the index exceeds the source length.
-				state = TokenizerState::START;
+        // This won't matter if the index exceeds the source length.
+        state = TokenizerState::START;
 
-				break;
-			}
-		}
-	}
+        break;
+      }
+    }
+  }
 
-	return tokens;
+  return tokens;
 }
 
 std::vector<u8> Assembler::Parse(const std::vector<Token> &tokens) {
-	std::vector<u8> bytes;
+  std::vector<u8> bytes;
 
-	return bytes;
+  return bytes;
 }
 
 }

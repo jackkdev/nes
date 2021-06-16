@@ -8,7 +8,7 @@
 namespace nes {
 
 CPU::CPU(Bus *bus) : bus_(bus) {
-	// Thank you OLC!
+  // Thank you OLC!
 //	using a = CPU;
 //	instructions_ = {
 //			{ "BRK", &a::BRK, &a::IMM, 7 },{ "ORA", &a::ORA, &a::IZX, 6 },{ "???", &a::XXX, &a::IMP, 2 },{ "???", &a::XXX, &a::IMP, 8 },{ "???", &a::NOP, &a::IMP, 3 },{ "ORA", &a::ORA, &a::ZP0, 3 },{ "ASL", &a::ASL, &a::ZP0, 5 },{ "???", &a::XXX, &a::IMP, 5 },{ "PHP", &a::PHP, &a::IMP, 3 },{ "ORA", &a::ORA, &a::IMM, 2 },{ "ASL", &a::ASL, &a::IMP, 2 },{ "???", &a::XXX, &a::IMP, 2 },{ "???", &a::NOP, &a::IMP, 4 },{ "ORA", &a::ORA, &a::ABS, 4 },{ "ASL", &a::ASL, &a::ABS, 6 },{ "???", &a::XXX, &a::IMP, 6 },
@@ -33,125 +33,124 @@ CPU::CPU(Bus *bus) : bus_(bus) {
 CPU::~CPU() = default;
 
 void CPU::Write(u16 address, u8 data) {
-	bus_->Write(address, data);
+  bus_->Write(address, data);
 }
 
 uint8_t CPU::Read(u16 address, bool readonly) {
-	return bus_->Read(address, readonly);
+  return bus_->Read(address, readonly);
 }
 
 bool CPU::GetFlag(CPU::Flag flag) const {
-	return ((status_ & flag) > 0);
+  return ((status_ & flag) > 0);
 }
 
 void CPU::SetFlag(CPU::Flag flag, bool value) {
-	if (value)
-		status_ |= flag;
-	else
-		status_ |= ~flag;
+  if (value)
+    status_ |= flag;
+  else
+    status_ |= ~flag;
 }
 
 u8 CPU::Fetch() {
-	if (instructions_[0x00].addrmode != &CPU::IMP)
-		fetched_ = Read(fetch_address_);
+  if (instructions_[0x00].addrmode != &CPU::IMP)
+    fetched_ = Read(fetch_address_);
 
-	return fetched_;
+  return fetched_;
 }
 
 u8 CPU::IMP() {
-	fetched_ = a_;
-	return 0;
+  fetched_ = a_;
+  return 0;
 }
 
 u8 CPU::IMM() {
-	fetch_address_ = pc_++;
+  fetch_address_ = pc_++;
 
-	return 0;
+  return 0;
 }
 
 u8 CPU::ZP0() {
-	fetch_address_ = Read(pc_++);
-	fetch_address_ &= 0x00FF;
+  fetch_address_ = Read(pc_++);
+  fetch_address_ &= 0x00FF;
 
-	return 0;
+  return 0;
 }
 
 u8 CPU::ZPX() {
-	fetch_address_ = Read(pc_++ + x_);
-	fetch_address_ &= 0x00FF;
+  fetch_address_ = Read(pc_++ + x_);
+  fetch_address_ &= 0x00FF;
 
-	return 0;
+  return 0;
 }
 
 u8 CPU::ZPY() {
-	fetch_address_ = Read(pc_++ + y_);
-	fetch_address_ &= 0x00FF;
+  fetch_address_ = Read(pc_++ + y_);
+  fetch_address_ &= 0x00FF;
 
-	return 0;
+  return 0;
 }
 
 u8 CPU::REL() {
-	relative_fetch_address_ = Read(pc_++);
+  relative_fetch_address_ = Read(pc_++);
 
-	// Check if the value is negative.
-	if (relative_fetch_address_ & 0x80)
-		relative_fetch_address_ |= 0xFF00;
+  // Check if the value is negative.
+  if (relative_fetch_address_ & 0x80)
+    relative_fetch_address_ |= 0xFF00;
 
-	return 0;
+  return 0;
 }
 
 u8 CPU::ABS() {
-	auto lo = Read(pc_++);
-	auto hi = Read(pc_++);
+  auto lo = Read(pc_++);
+  auto hi = Read(pc_++);
 
-	fetch_address_ = (hi << 8) | lo;
+  fetch_address_ = (hi << 8) | lo;
 
-	return 0;
+  return 0;
 }
 
 u8 CPU::ABX() {
-	auto lo = Read(pc_++);
-	auto hi = Read(pc_++);
+  auto lo = Read(pc_++);
+  auto hi = Read(pc_++);
 
-	fetch_address_ = (hi << 8) | lo;
-	fetch_address_ += x_;
+  fetch_address_ = (hi << 8) | lo;
+  fetch_address_ += x_;
 
-	return ((fetch_address_ & 0xFF00) != (hi << 8)) ? 1 : 0;
+  return ((fetch_address_ & 0xFF00) != (hi << 8)) ? 1 : 0;
 }
 
 u8 CPU::ABY() {
-	auto lo = Read(pc_++);
-	auto hi = Read(pc_++);
+  auto lo = Read(pc_++);
+  auto hi = Read(pc_++);
 
-	fetch_address_ = (hi << 8) | lo;
-	fetch_address_ += y_;
+  fetch_address_ = (hi << 8) | lo;
+  fetch_address_ += y_;
 
-	return ((fetch_address_ & 0xFF00) != (hi << 8)) ? 1 : 0;
+  return ((fetch_address_ & 0xFF00) != (hi << 8)) ? 1 : 0;
 }
 
 u8 CPU::IND() {
-	auto lo = Read(pc_++);
-	auto hi = Read(pc_++);
+  auto lo = Read(pc_++);
+  auto hi = Read(pc_++);
 
-	auto address = (hi << 8) | lo;
+  auto address = (hi << 8) | lo;
 
-	// Simulate the page-wrapping bug that existed on the 6502.
-	if (lo == 0x00FF)
-		fetch_address_ = (Read(address & 0xFF00) << 8) | Read(address);
-	else
-		fetch_address_ = (Read(address + 1) << 8) | Read(address);
+  // Simulate the page-wrapping bug that existed on the 6502.
+  if (lo == 0x00FF)
+    fetch_address_ = (Read(address & 0xFF00) << 8) | Read(address);
+  else
+    fetch_address_ = (Read(address + 1) << 8) | Read(address);
 
-	return 0;
+  return 0;
 }
 
 u8 CPU::IZX() {
 
-
-	return 0;
+  return 0;
 }
 
 u8 CPU::IZY() {
-	return 0;
+  return 0;
 }
 
 }

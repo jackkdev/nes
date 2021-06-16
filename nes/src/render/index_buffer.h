@@ -13,14 +13,14 @@ namespace nes {
 
 class IndexBuffer {
  public:
-	IndexBuffer();
-	~IndexBuffer();
+  IndexBuffer();
+  ~IndexBuffer();
 
-	void SetData(void *data, i32 data_size, i32 draw_mode) const;
-	void Bind() const;
+  void SetData(void *data, i32 data_size, i32 draw_mode) const;
+  void Bind() const;
 
  private:
-	u32 index_buffer_id_ = 0;
+  u32 index_buffer_id_ = 0;
 };
 
 }

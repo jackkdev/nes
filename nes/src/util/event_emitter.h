@@ -14,26 +14,26 @@ namespace nes {
 
 class Event {
  public:
-	virtual ~Event() = default;
+  virtual ~Event() = default;
 
-	using KeyType = const char *;
-	[[nodiscard]] virtual KeyType Type() const = 0;
+  using KeyType = const char *;
+  [[nodiscard]] virtual KeyType Type() const = 0;
 };
 
 class EventEmitter {
  public:
-	using KeyType = const char *;
-	using HandlerType = std::function<void(const Event &event)>;
+  using KeyType = const char *;
+  using HandlerType = std::function<void(const Event &event)>;
 
  public:
-	EventEmitter() = default;
-	~EventEmitter() = default;
+  EventEmitter() = default;
+  ~EventEmitter() = default;
 
-	void Emit(const Event &event) const;
-	void On(KeyType key, const HandlerType& handler);
+  void Emit(const Event &event) const;
+  void On(KeyType key, const HandlerType &handler);
 
  private:
-	std::map<KeyType, std::vector<HandlerType>> handlers_;
+  std::map<KeyType, std::vector<HandlerType>> handlers_;
 };
 
 }

@@ -15,21 +15,21 @@ namespace nes {
 
 class VertexArray {
  public:
-	struct Layout {
-		i32 size;
-		i32 type;
-		bool normalized;
-	};
+  struct Layout {
+    i32 size;
+    i32 type;
+    bool normalized;
+  };
 
  public:
-	VertexArray();
-	~VertexArray();
+  VertexArray();
+  ~VertexArray();
 
-	void SetLayout(const std::vector<Layout> &layouts) const;
-	void Bind() const;
+  void SetLayout(const std::vector<Layout> &layouts) const;
+  void Bind() const;
 
  private:
-	u32 vertex_array_id_ = 0;
+  u32 vertex_array_id_ = 0;
 };
 
 }

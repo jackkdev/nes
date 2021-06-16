@@ -21,55 +21,46 @@ namespace nes {
 
 class Assembler {
  public:
-	enum class TokenType {
-		LITERAL,
-		DECIMAL_NUMBER,
-		HEXADECIMAL_NUMBER,
-		COMMENT,
-		COLLEN,
-		DOLLAR_SIGN,
-		PARENTHESES,
-		COMMA,
-		HASHTAG,
-	};
+  enum class TokenType {
+    LITERAL,
+    DECIMAL_NUMBER,
+    HEXADECIMAL_NUMBER,
+    COMMENT,
+    COLLEN,
+    DOLLAR_SIGN,
+    PARENTHESES,
+    COMMA,
+    HASHTAG,
+  };
 
-	struct Token {
-		TokenType type;
-		std::string data;
-	};
+  struct Token {
+    TokenType type;
+    std::string data;
+  };
 
  public:
-	Assembler() = default;
-	~Assembler() = default;
+  Assembler() = default;
+  ~Assembler() = default;
 
-	std::vector<Token> Tokenize(const std::string &source);
+  std::vector<Token> Tokenize(const std::string &source);
 
-	std::vector<u8> Parse(const std::vector<Token> &tokens);
+  std::vector<u8> Parse(const std::vector<Token> &tokens);
 
-	static std::string TypeToString(TokenType type) {
-		switch (type) {
-			case TokenType::LITERAL:
-				return "LITERAL";
-			case TokenType::COLLEN:
-				return "COLLEN";
-			case TokenType::DOLLAR_SIGN:
-				return "DOLLAR_SIGN";
-			case TokenType::PARENTHESES:
-				return "PARENTHESES";
-			case TokenType::COMMA:
-				return "COMMA";
-			case TokenType::HASHTAG:
-				return "HASHTAG";
-			case TokenType::COMMENT:
-				return "COMMENT";
-			case TokenType::DECIMAL_NUMBER:
-				return "DECIMAL_NUMBER";
-			case TokenType::HEXADECIMAL_NUMBER:
-				return "HEXADECIMAL_NUMBER";
-		}
+  static std::string TypeToString(TokenType type) {
+    switch (type) {
+      case TokenType::LITERAL: return "LITERAL";
+      case TokenType::COLLEN: return "COLLEN";
+      case TokenType::DOLLAR_SIGN: return "DOLLAR_SIGN";
+      case TokenType::PARENTHESES: return "PARENTHESES";
+      case TokenType::COMMA: return "COMMA";
+      case TokenType::HASHTAG: return "HASHTAG";
+      case TokenType::COMMENT: return "COMMENT";
+      case TokenType::DECIMAL_NUMBER: return "DECIMAL_NUMBER";
+      case TokenType::HEXADECIMAL_NUMBER: return "HEXADECIMAL_NUMBER";
+    }
 
-		return "N/A";
-	}
+    return "N/A";
+  }
 };
 
 }

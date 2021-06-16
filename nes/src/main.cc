@@ -11,17 +11,16 @@ using namespace nes;
 #include <cstdlib>
 
 int main(int argc, char **argv) {
-	std::ifstream stream("test.asm");
-	std::string buffer;
-	std::string source;
-	while (std::getline(stream, buffer))
-		source += buffer + "\n";
+  std::ifstream stream("test.asm");
+  std::string buffer;
+  std::string source;
+  while (std::getline(stream, buffer))
+    source += buffer + "\n";
 
+  Assembler assembler;
+  auto tokens = assembler.Tokenize("FF00Q:$(),#");
+  for (auto &token : tokens)
+    printf("[%s: %s]\n", Assembler::TypeToString(token.type).c_str(), token.data.c_str());
 
-	Assembler assembler;
-	auto tokens = assembler.Tokenize("FF00Q:$(),#");
-	for (auto &token : tokens)
-		printf("[%s: %s]\n", Assembler::TypeToString(token.type).c_str(), token.data.c_str());
-
-	return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }

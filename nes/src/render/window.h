@@ -20,40 +20,40 @@ namespace nes {
 // The Window class emits events based on the GLFW window event that happened.
 class Window {
  private:
-	static u32 s_window_count;
+  static u32 s_window_count;
 
  public:
-	struct Data {
-		const char *title;
-		i32 width, height;
-	};
+  struct Data {
+    const char *title;
+    i32 width, height;
+  };
 
-	using Options = Data;
+  using Options = Data;
 
  public:
-	explicit Window(const Options &options);
-	~Window();
+  explicit Window(const Options &options);
+  ~Window();
 
-	// Polls window events such as keyboard input, cursor input, etc.
-	static void PollEvents();
+  // Polls window events such as keyboard input, cursor input, etc.
+  static void PollEvents();
 
-	// Swaps the back buffers to display the current image.
-	void SwapBuffers() const;
+  // Swaps the back buffers to display the current image.
+  void SwapBuffers() const;
 
-	[[nodiscard]] const char *GetTitle() const;
-	void SetTitle(const char *title);
+  [[nodiscard]] const char *GetTitle() const;
+  void SetTitle(const char *title);
 
-	[[nodiscard]] std::tuple<u32, u32> GetSize() const;
-	void SetSize(i32 width, i32 height);
+  [[nodiscard]] std::tuple<u32, u32> GetSize() const;
+  void SetSize(i32 width, i32 height);
 
-	[[nodiscard]] bool ShouldClose() const;
-	void SetShouldClose(bool should_close);
+  [[nodiscard]] bool ShouldClose() const;
+  void SetShouldClose(bool should_close);
 
-	GLFWwindow *GetHandle();
+  GLFWwindow *GetHandle();
 
  private:
-	GLFWwindow* handle_ = nullptr;
-	Data data_ = {};
+  GLFWwindow *handle_ = nullptr;
+  Data data_ = {};
 };
 
 }

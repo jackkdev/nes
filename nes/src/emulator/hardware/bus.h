@@ -14,16 +14,16 @@ namespace nes {
 
 class Bus {
  public:
-	Bus();
-	~Bus();
+  Bus();
+  ~Bus();
 
  public:
-	void Write(u16 address, u8 data);
-	uint8_t Read(u16 address, bool readonly = false);
+  void Write(u16 address, u8 data);
+  uint8_t Read(u16 address, bool readonly = false);
 
  private:
-	CPU cpu_;
-	std::array<u8, 64 * 1024> ram_ = {};
+  CPU cpu_;
+  std::array<u8, 64 * 1024> ram_ = {};
 };
 
 }
