@@ -5,7 +5,10 @@
 #ifndef NES_NES_SRC_CPU_H_
 #define NES_NES_SRC_CPU_H_
 
-#include "../util/types.h"
+#include "../../util/types.h"
+
+#include <string>
+#include <vector>
 
 namespace nes {
 
@@ -50,8 +53,14 @@ class CPU {
 	u8 status_ = 0x00; // Status register.
 
  private: // Addressing modes.
-	u8 fetched_; // Value fetched by fetch or IMP addressing mode.
-	u16 fetch_address_, relative_fetch_address_; // The absolute and relative address to fetch from.
+	u8 fetched_ = 0; // Value fetched by fetch or IMP addressing mode.
+	u16 fetch_address_ = 0, relative_fetch_address_ = 0; // The absolute and relative address to fetch from.
+	u8 opcode_ = 0; // The current opcode being processed.
+
+	// Sources the data needed for the instruction. This method uses the fetch_address_ member variable, which is set by
+	// the addressing mode method, to fetch data for the instruction. All modes except implied will read from memory.
+	// If implied is used, the fetched_ member variable will be pre-assigned to the accumulator register.
+	u8 Fetch();
 
 	u8 IMP(); u8 IMM();
 	u8 ZP0(); u8 ZPX();
@@ -77,6 +86,15 @@ class CPU {
 	u8 TSX();	u8 TXA();	u8 TXS();	u8 TYA();
 
 	u8 XXX();
+
+	struct Instruction {
+		std::string name;
+		uint8_t (CPU::*operate)() = nullptr;
+		uint8_t (CPU::*addrmode)() = nullptr;
+		uint8_t cycles = 0;
+	};
+
+	std::vector<Instruction> instructions_;
 };
 
 }

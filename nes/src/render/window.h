@@ -16,6 +16,8 @@
 
 namespace nes {
 
+// Provides a wrapper around the GLFW window system.
+// The Window class emits events based on the GLFW window event that happened.
 class Window {
  private:
 	static u32 s_window_count;
@@ -32,7 +34,10 @@ class Window {
 	explicit Window(const Options &options);
 	~Window();
 
-	static void PollEvents() ;
+	// Polls window events such as keyboard input, cursor input, etc.
+	static void PollEvents();
+
+	// Swaps the back buffers to display the current image.
 	void SwapBuffers() const;
 
 	[[nodiscard]] const char *GetTitle() const;
@@ -43,6 +48,8 @@ class Window {
 
 	[[nodiscard]] bool ShouldClose() const;
 	void SetShouldClose(bool should_close);
+
+	GLFWwindow *GetHandle();
 
  private:
 	GLFWwindow* handle_ = nullptr;

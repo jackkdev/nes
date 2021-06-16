@@ -29,6 +29,9 @@ Window::Window(const Window::Options &options) {
 	// Setup the GLFW window context.
 	glfwMakeContextCurrent(handle_);
 
+	// Disable v-sync.
+	glfwSwapInterval(0);
+
 	// Setup the OpenGL context.
 	if (!gladLoadGL(glfwGetProcAddress))
 		exit(1);
@@ -70,6 +73,10 @@ bool Window::ShouldClose() const {
 
 void Window::SetShouldClose(bool should_close) {
 	glfwSetWindowShouldClose(handle_, should_close);
+}
+
+GLFWwindow *Window::GetHandle() {
+	return handle_;
 }
 
 }

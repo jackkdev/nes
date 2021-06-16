@@ -38,7 +38,6 @@ void VertexArray::SetLayout(const std::vector<Layout> &layouts) const {
 	for (auto &layout : layouts) {
 		glEnableVertexAttribArray(index);
 		glVertexAttribPointer(index++, layout.size, layout.type, layout.normalized, stride, reinterpret_cast<void *>(offset));
-		printf("Index: %i\nSize: %i\nStride: %i\nOffset: %lli\n", index - 1, layout.size, stride, offset);
 
 		offset += GetSizeFromType(layout.type) * layout.size;
 	}

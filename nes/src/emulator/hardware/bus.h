@@ -6,7 +6,7 @@
 #define NES_NES_SRC_HARDWARE_BUS_H_
 
 #include "cpu.h"
-#include "../util/types.h"
+#include "../../util/types.h"
 
 #include <array>
 
