@@ -10,12 +10,15 @@ set(
         src/emulator/hardware/bus.cc src/emulator/hardware/bus.h
         src/emulator/hardware/cpu.cc src/emulator/hardware/cpu.h
 
+        src/emulator/asm/assembler.cc src/emulator/asm/assembler.h
+
         src/render/window.cc src/render/window.h
         src/render/shader.cc src/render/shader.h
         src/render/vertex_buffer.cc src/render/vertex_buffer.h
         src/render/vertex_array.cc src/render/vertex_array.h
         src/render/index_buffer.cc src/render/index_buffer.h
 
+        src/util/event_emitter.cc src/util/event_emitter.h
         src/util/types.h
 )
 
@@ -39,7 +42,7 @@ set(
 
         ${PROJECT_SOURCE_DIR}/extern/imgui/backends/imgui_impl_opengl3.cpp
         ${PROJECT_SOURCE_DIR}/extern/imgui/backends/imgui_impl_opengl3.h
-        src/util/event_emitter.cc src/util/event_emitter.h src/emulator/asm/assembler.cc src/emulator/asm/assembler.h)
+)
 
 add_executable(
         nes
@@ -65,3 +68,34 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/extern/glm
         ${PROJECT_SOURCE_DIR}/extern/imgui
 )
+
+set(
+        NES_TEST_SRC
+
+        test/emulator/asm/assembler_test.cc
+
+        src/emulator/hardware/bus.cc src/emulator/hardware/bus.h
+        src/emulator/hardware/cpu.cc src/emulator/hardware/cpu.h
+
+        src/emulator/asm/assembler.cc src/emulator/asm/assembler.h
+
+        src/util/event_emitter.cc src/util/event_emitter.h
+        src/util/types.h
+)
+
+enable_testing()
+
+add_executable(
+        nes_test
+
+        ${NES_TEST_SRC}
+)
+
+target_link_libraries(
+        nes_test
+
+        gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(nes_test)

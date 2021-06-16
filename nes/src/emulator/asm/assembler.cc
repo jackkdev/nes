@@ -36,8 +36,6 @@ std::vector<Assembler::Token> Assembler::Tokenize(const std::string &source) {
       std::make_pair('(', TokenType::PARENTHESES),
       std::make_pair(')', TokenType::PARENTHESES),
       std::make_pair(',', TokenType::COMMA),
-      std::make_pair('#', TokenType::HASHTAG),
-      std::make_pair('$', TokenType::DOLLAR_SIGN),
   };
 
   // Container to store tokens generated from the source.
@@ -47,27 +45,19 @@ std::vector<Assembler::Token> Assembler::Tokenize(const std::string &source) {
   auto state = TokenizerState::START;
 
   bool eof = false;
+
   i32 index = 0;
   Token token = {};
 
   while (!eof) {
+    if (index >= source.length())
+      state = TokenizerState::END;
+
     // Every iteration we'll read the state value, and modify the current token based on that.
     switch (state) {
       case TokenizerState::START: {
         // Read in the current source character.
         char input = source[index];
-
-        // We'll start with a hexadecimal number since it can switch mid-tokenization to a literal if the continuing
-        // characters aren't within the hexadecimal validation string.
-        if (s_hexadecimal_characters.find(input) != std::string::npos) {
-          token.type = TokenType::HEXADECIMAL_NUMBER;
-          token.data += input;
-
-          state = TokenizerState::HEXADECIMAL_NUMBER;
-          index++;
-
-          break;
-        }
 
         // Literal check.
         if (s_literal_first_characters.find(input) != std::string::npos) {
@@ -80,12 +70,41 @@ std::vector<Assembler::Token> Assembler::Tokenize(const std::string &source) {
           break;
         }
 
-        // Decimal number check.
-        if (s_decimal_characters.find(input) != std::string::npos) {
+        // Immediate value check.
+        if (input == '#') {
+          // Hexadecimal immediate value.
+          if (source[index + 1] == '$') {
+            token.type = TokenType::HEXADECIMAL_NUMBER;
+            state = TokenizerState::HEXADECIMAL_NUMBER;
+            index += 2;
+
+            break;
+          }
+
+          // Decimal immediate value.
           token.type = TokenType::DECIMAL_NUMBER;
+          state = TokenizerState::DECIMAL_NUMBER;
+          index++;
+
+          break;
+        }
+
+        // Hexadecimal address check.
+        if (source[index] == '$') {
+          token.type = TokenType::HEXADECIMAL_ADDRESS;
+
+          state = TokenizerState::HEXADECIMAL_NUMBER;
+          index ++;
+
+          break;
+        }
+
+        // Comment check.
+        if (input == ';') {
+          token.type = TokenType::COMMENT;
           token.data += input;
 
-          state = TokenizerState::DECIMAL_NUMBER;
+          state = TokenizerState::COMMENT;
           index++;
 
           break;
@@ -109,11 +128,6 @@ std::vector<Assembler::Token> Assembler::Tokenize(const std::string &source) {
       }
 
       case TokenizerState::LITERAL: {
-        if (index >= source.length()) {
-          state = TokenizerState::END;
-          break;
-        }
-
         char input = source[index];
 
         // Save the token if the character isn't valid.
@@ -129,28 +143,10 @@ std::vector<Assembler::Token> Assembler::Tokenize(const std::string &source) {
       };
 
       case TokenizerState::HEXADECIMAL_NUMBER: {
-        if (index >= source.length()) {
-          state = TokenizerState::END;
-          break;
-        }
-
         char input = source[index];
 
         // Check if the input character exists within the hexadecimal validation characters.
         if (s_hexadecimal_characters.find(input) == std::string::npos) {
-          // If not, we'll check if it's a valid literal character, and switch state.
-          if (s_literal_characters.find(input) != std::string::npos) {
-            token.type = TokenType::LITERAL;
-            token.data += input;
-
-            // Switching to the literal token type since this is no longer a valid hex string.
-            state = TokenizerState::LITERAL;
-            index++;
-
-            break;
-          }
-
-          // If we're here then it's the end of the number.
           state = TokenizerState::END;
           break;
         }
@@ -162,9 +158,34 @@ std::vector<Assembler::Token> Assembler::Tokenize(const std::string &source) {
         break;
       }
 
-      case TokenizerState::DECIMAL_NUMBER: break;
+      case TokenizerState::DECIMAL_NUMBER: {
+        char input = source[index];
 
-      case TokenizerState::COMMENT: break;
+        // Check if this is still a valid decimal number.
+        if (s_decimal_characters.find(input) == std::string::npos) {
+          state = TokenizerState::END;
+          break;
+        }
+
+        token.data += input;
+        index++;
+
+        break;
+      }
+
+      case TokenizerState::COMMENT: {
+        char input = source[index];
+
+        if (input == '\n') {
+          state = TokenizerState::END;
+          break;
+        }
+
+        token.data += input;
+        index++;
+
+        break;
+      }
 
       case TokenizerState::END: {
         // First we need to check if there even is a token to save.
@@ -190,6 +211,8 @@ std::vector<Assembler::Token> Assembler::Tokenize(const std::string &source) {
 
 std::vector<u8> Assembler::Parse(const std::vector<Token> &tokens) {
   std::vector<u8> bytes;
+
+
 
   return bytes;
 }

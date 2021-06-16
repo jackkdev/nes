@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     source += buffer + "\n";
 
   Assembler assembler;
-  auto tokens = assembler.Tokenize("FF00Q:$(),#");
+  auto tokens = assembler.Tokenize(source);
   for (auto &token : tokens)
     printf("[%s: %s]\n", Assembler::TypeToString(token.type).c_str(), token.data.c_str());
 

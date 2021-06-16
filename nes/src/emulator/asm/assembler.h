@@ -25,6 +25,7 @@ class Assembler {
     LITERAL,
     DECIMAL_NUMBER,
     HEXADECIMAL_NUMBER,
+    HEXADECIMAL_ADDRESS,
     COMMENT,
     COLLEN,
     DOLLAR_SIGN,
@@ -57,6 +58,7 @@ class Assembler {
       case TokenType::COMMENT: return "COMMENT";
       case TokenType::DECIMAL_NUMBER: return "DECIMAL_NUMBER";
       case TokenType::HEXADECIMAL_NUMBER: return "HEXADECIMAL_NUMBER";
+      case TokenType::HEXADECIMAL_ADDRESS: return "HEXADECIMAL_ADDRESS";
     }
 
     return "N/A";
