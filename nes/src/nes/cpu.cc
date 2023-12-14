@@ -2,19 +2,24 @@
 
 namespace nes {
 
-Cpu::Cpu() : r_({.a = 0, .x = 0, .y = 0, .pc = 0, .s = 0, .p = 0}), as_() {}
+CpuAddressSpace::CpuAddressSpace(const std::shared_ptr<CpuRam> &ram)
+    : ram_(ram) {}
+
+CpuAddressSpace::~CpuAddressSpace() = default;
+
+u8 CpuAddressSpace::Read(u16 address) { return 0; }
+
+void CpuAddressSpace::Write(u16 address, u8 data) {}
+
+Cpu::Cpu() : r_({.a = 0, .x = 0, .y = 0, .pc = 0, .s = 0, .p = 0}) {}
 
 Cpu::~Cpu() = default;
 
-u8 Cpu::Clock() {
-  return 0;
+void Cpu::Attach(std::unique_ptr<CpuAddressSpace> as) {
+  as_ = std::move(as);
 }
 
-u8 Cpu::Read(u16 address) {
-  return 0;
-}
-
-void Cpu::Write(u16 address, u8 value) {}
+u8 Cpu::Clock() { return 0; }
 
 /// <editor-fold desc="Addressing Modes">
 u8 Cpu::IMP() { return 0; }
