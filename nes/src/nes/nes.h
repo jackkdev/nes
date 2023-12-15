@@ -1,8 +1,15 @@
-#ifndef NES_NES_SRC_NES_H_
-#define NES_NES_SRC_NES_H_
+//
+// Copyright (c) 2023 - darkrp-is.gay, All rights reserved.
+//
 
-#include "renderer.h"
-#include "cpu.h"
+#ifndef NES_NES_SRC_NES_NES_H_
+#define NES_NES_SRC_NES_NES_H_
+
+#include "emulator/emulator.h"
+#include "graphics/window.h"
+#include "graphics/renderer.h"
+
+#include <memory>
 
 namespace nes {
 
@@ -14,12 +21,11 @@ public:
   void Run();
 
 private:
+  std::shared_ptr<Emulator> emulator_;
+  std::shared_ptr<Window> window_;
   std::shared_ptr<Renderer> renderer_;
-
-  std::shared_ptr<Cpu> cpu_;
-  std::shared_ptr<CpuRam> cpu_ram_;
 };
 
 } // namespace nes
 
-#endif // NES_NES_SRC_NES_H_
+#endif // NES_NES_SRC_NES_NES_H_

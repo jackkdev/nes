@@ -1,7 +1,7 @@
 #ifndef NES_NES_SRC_CPU_H_
 #define NES_NES_SRC_CPU_H_
 
-#include "types.h"
+#include "../types.h"
 
 namespace nes {
 
@@ -19,28 +19,61 @@ private:
   std::shared_ptr<CpuRam> ram_;
 };
 
+enum CpuFlag : u8 {
+  kC = 1,
+  kZ = 1 << 1,
+  kI = 1 << 2,
+  kD = 1 << 3,
+  kB = 1 << 4,
+  kU = 1 << 5,
+  kV = 1 << 6,
+  kN = 1 << 7,
+};
+
 struct CpuRegisters {
   u8 a;
   u8 x, y;
   u16 pc;
   u8 s;
   u8 p;
+
+  [[nodiscard]] bool GetFlag(CpuFlag flag) const { return (p & u8(flag)) != 0; }
+
+  void SetFlag(CpuFlag flag, bool value) {
+    if (value)
+      p |= u8(flag);
+    else
+      p &= ~u8(flag);
+  }
 };
 
 class Cpu {
+public:
+  struct Instruction {
+    const char *name;
+    u8 (Cpu::*operation_handler)();
+    u8 (Cpu::*addressing_mode_handler)();
+    u8 cycles;
+  };
+
 public:
   explicit Cpu();
   ~Cpu();
 
   void Attach(std::unique_ptr<CpuAddressSpace> as);
 
+  [[nodiscard]] const CpuRegisters &GetRegisters() const;
+
   u8 Clock();
+
+private:
+  void Fetch();
 
 private:
   // clang-format off
   /// Addressing Modes
-  u8 IMP(); u8 ACC(); u8 IMM(); u8 ZPG(); u8 ABS(); u8 REL(); u8 IND();
-  u8 ZPX(); u8 ZPY(); u8 ABX(); u8 ABY(); u8 IXI(); u8 IIX();
+  u8 IMP(); u8 IMM(); u8 ZP0(); u8 ABS(); u8 REL(); u8 IND();
+  u8 ZPX(); u8 ZPY(); u8 ABX(); u8 ABY(); u8 IZX(); u8 IZY();
 
   /// Instructions
   u8 ADC(); u8 AND(); u8 ASL(); u8 BCC(); u8 BCS(); u8 BEQ(); u8 BIT(); u8 BMI();
@@ -58,6 +91,13 @@ private:
 private:
   std::unique_ptr<CpuAddressSpace> as_;
   CpuRegisters r_;
+  std::vector<Instruction> lookup_;
+
+  u8 cycles_;
+  u8 opcode_;
+  Instruction *inst_;
+  u8 arg_;
+  u16 arg_addr_;
 };
 
 } // namespace nes

@@ -1,22 +1,33 @@
+//
+// Copyright (c) 2023 - darkrp-is.gay, All rights reserved.
+//
+
 #include "nes.h"
+
+#include "graphics/imgui_layer.h"
 
 namespace nes {
 
 Nes::Nes()
-    : renderer_(std::make_shared<Renderer>(RendererOptions{
-          .title = "nes v0.0.1",
-          .width = 800,
-          .height = 600,
-      })),
-      cpu_(std::make_shared<Cpu>()), cpu_ram_(std::make_shared<CpuRam>()) {
-  cpu_->Attach(std::make_unique<CpuAddressSpace>(cpu_ram_));
+    : emulator_(std::make_shared<Emulator>()),
+      window_(std::make_shared<Window>(WindowOptions{
+          .title = "NES Emulator - v0.1.0", .width = 800, .height = 600})),
+      renderer_(std::make_shared<Renderer>(window_)) {
+  renderer_->PushLayer(std::make_unique<ImGuiLayer>(window_->Handle(), emulator_));
 }
 
 Nes::~Nes() = default;
 
 void Nes::Run() {
-  while (!renderer_->ShouldClose()) {
-    renderer_->Present();
+  while (!window_->ShouldClose()) {
+    window_->PollEvents();
+
+    if (window_->KeyPressed(nes::Key::kQ))
+      window_->SetShouldClose(true);
+
+    renderer_->Draw();
+
+    window_->SwapBuffers();
   }
 }
 
